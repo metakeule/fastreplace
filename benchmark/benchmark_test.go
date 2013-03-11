@@ -253,10 +253,10 @@ func BenchmarkNaiveOneShot(b *testing.B) {
 }
 
 func BenchmarkOneShotReg(b *testing.B) {
+	mapperReg.Setup()
 	for i := 0; i < b.N; i++ {
 		mapperReg.Map = Map
 		mapperReg.Template = TemplateX
-		mapperReg.Setup()
 		mapperReg.Replace()
 	}
 }
