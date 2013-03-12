@@ -5,7 +5,7 @@ import (
 	"github.com/metakeule/fastreplace"
 )
 
-var r = fastreplace.NewString("@@", "@@name@@ / @@city@@")
+var r, _ = fastreplace.NewString("@@", "@@name@@ / @@city@@")
 var posCity = r.Pos("city")[0]
 var posName = r.Pos("name")[0]
 

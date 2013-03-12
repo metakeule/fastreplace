@@ -39,3 +39,11 @@ func TestReplaceMulti(t *testing.T) {
 		t.Errorf("unexpected result for: %#v, expected: %#v", string(r), Expected)
 	}
 }
+
+func TestReplaceSyntaxError(t *testing.T) {
+	ſ := replace.Parse([]byte("@@"), []byte("before @@one@@@@two@@ after"))
+	// ŧ.Println(ſ)
+	if ſ == nil {
+		t.Errorf("expected syntax error for 2 placeholders side by side, got none")
+	}
+}

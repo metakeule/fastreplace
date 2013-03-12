@@ -2,6 +2,7 @@ package fastreplace
 
 import (
 	"bytes"
+	"fmt"
 	"sort"
 )
 
@@ -24,13 +25,13 @@ type FReplace struct {
 	sortedPos []int
 }
 
-func New(delimiter []byte, input []byte) (ø *FReplace) {
+func New(delimiter []byte, input []byte) (ø *FReplace, ſ error) {
 	ø = &FReplace{}
-	ø.Parse(delimiter, input)
+	ſ = ø.Parse(delimiter, input)
 	return
 }
 
-func NewString(delimiter string, input string) (ø *FReplace) {
+func NewString(delimiter string, input string) (ø *FReplace, ſ error) {
 	return New([]byte(delimiter), []byte(input))
 }
 
@@ -97,7 +98,7 @@ func (ø *FReplace) ParseString(delimiter string, s string) {
 }
 
 // parse the input for placeholders and caches the result
-func (ø *FReplace) Parse(delimiter []byte, in []byte) {
+func (ø *FReplace) Parse(delimiter []byte, in []byte) error {
 	ø.positions = map[int]string{}
 	ø.original = []byte{}
 	ø.sortedPos = []int{}
@@ -106,6 +107,9 @@ func (ø *FReplace) Parse(delimiter []byte, in []byte) {
 	for i := 0; i < lenIn; i++ {
 		found := bytes.Index(in[i:], delimiter)
 		if found != -1 {
+			if found == 0 && i != 0 {
+				return fmt.Errorf("Syntax error: can't have 2 or more placeholders side by side: %#v\n", string(in[:i+lenDel]))
+			}
 			start := found + i
 			ø.original = append(ø.original, in[i:start]...)
 			startPlaceH := start + lenDel
@@ -127,6 +131,7 @@ func (ø *FReplace) Parse(delimiter []byte, in []byte) {
 		}
 	}
 	sort.Ints(ø.sortedPos)
+	return nil
 }
 
 // returns an Instance that offers more comfort and caching of replacements
