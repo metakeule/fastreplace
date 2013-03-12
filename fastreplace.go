@@ -11,8 +11,11 @@ import (
 	see README.md
 */
 
-type Compiler interface {
-	Compile() *FReplace
+type Replacer interface {
+	String() string
+	Replace() []byte
+	Assign(key string, val []byte)
+	AssignString(key string, val string)
 }
 
 type FReplace struct {
@@ -127,7 +130,7 @@ func (ø *FReplace) Parse(delimiter []byte, in []byte) {
 }
 
 // returns an Instance that offers more comfort and caching of replacements
-func (ø *FReplace) Instance() *Instance {
+func (ø *FReplace) Instance() Replacer {
 	return &Instance{replace: ø, replacePos: map[int][]byte{}}
 }
 
