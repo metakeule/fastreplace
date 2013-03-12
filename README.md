@@ -4,7 +4,7 @@ fastreplace
 [![Build Status](https://secure.travis-ci.org/metakeule/fastreplace.png)](http://travis-ci.org/metakeule/fastreplace)
 
 The typical scenario is that your template never changes but the replacements for you placeholders. fastreplace
-is faster than using (strings|bytes).replace or regexp.ReplaceAllStringFunc in this situation.
+is faster than using (strings|bytes).Replace or regexp.ReplaceAllStringFunc in this situation.
 
 Performance
 -----------
