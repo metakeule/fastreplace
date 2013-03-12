@@ -4,33 +4,36 @@ fastreplace
 [![Build Status](https://secure.travis-ci.org/metakeule/fastreplace.png)](http://travis-ci.org/metakeule/fastreplace)
 
 The typical scenario is that your template never changes but the replacements for you placeholders. fastreplace
-is faster than using strings.replace or regexp.ReplaceAllStringFunc in this situation.
+is faster than using (strings|bytes).replace or regexp.ReplaceAllStringFunc in this situation.
 
 Performance
 -----------
 
 Run benchmarks in benchmark directory.
-On my laptop I get the following results:
+I get the following results on my laptop:
 
 replacing 2 placeholders that occur 2500x in the template
 
-	BenchmarkNaive	         500	   3653172 ns/op      2,6x (strings.replace)
-	BenchmarkReg	         100	  24978530 ns/op     17,6x (regexp.ReplaceAllStringFunc)
-	BenchmarkFReplace	    1000	   2037904 ns/op      1,4x
-	BenchmarkFReplacePos	1000	   1418960 ns/op      1,0x
+	BenchmarkNaive	         500	 3759998 ns/op    2,5x (strings.Replace)
+	BenchmarkReg	         100	25826150 ns/op   17,1x (regexp.ReplaceAllStringFunc)
+	BenchmarkByte	        1000	 2862196 ns/op    1,9x (bytes.Replace)
+	BenchmarkFReplace	    1000	 2115185 ns/op    1,4x
+	BenchmarkFReplacePos	1000	 1513158 ns/op    1,0x
 
 replacing 5000 placeholders that occur 1x in the template
 
-	BenchmarkNaiveM		       1	5522101000 ns/op   3847,2x (strings.replace)
-	BenchmarkRegM		      50	  28921900 ns/op     20,1x (regexp.ReplaceAllStringFunc)
-	BenchmarkFReplaceM	    1000	   2382313 ns/op      1,7x
-	BenchmarkFReplacePosM	1000	   1435357 ns/op      1,0x
+	BenchmarkNaiveM	           1  5494931000 ns/op 3652,1x (strings.Replace)
+	BenchmarkRegM	          50	29896260 ns/op	 19,9x (regexp.ReplaceAllStringFunc)
+	BenchmarkByteM	           1  3881286000 ns/op 2579,7x (bytes.Replace)
+	BenchmarkFReplaceM	    1000     2368541 ns/op	  1,6x
+	BenchmarkFReplacePosM	1000	 1504577 ns/op	  1,0x
 
 replacing 2 placeholders that occur 1x in the template, parse template each time (you should not do this)
 
-	BenchmarkNaiveOneShot	        500	   3743120 ns/op  1,0x (strings.replace)
-	BenchmarkOneShotReg	            100	  25118460 ns/op  6,7x (regexp.ReplaceAllStringFunc)
-	BenchmarkFReplaceOneShot	    100	  15681430 ns/op  4,2x
+	BenchmarkNaiveOneShot	 500	 3756994 ns/op	  1,3x (strings.Replace)
+	BenchmarkOneShotReg	     100    25417730 ns/op	  8,6x (regexp.ReplaceAllStringFunc)
+	BenchmarkOneShotByte    1000	 2941726 ns/op	  1,0x (bytes.Replace)
+	BenchmarkFReplaceOneShot 200	 7813775 ns/op	  2,7x
 
 
 Example
