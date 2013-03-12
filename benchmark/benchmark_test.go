@@ -102,14 +102,7 @@ func TestReplace(t *testing.T) {
 		t.Errorf("unexpected result for %s: %#v", "freplace", string(r))
 	}
 
-	m := map[int][]byte{}
-
-	for k, v := range ByteMap {
-		pos := freplace.Pos(k)
-		for _, p := range pos {
-			m[p] = v
-		}
-	}
+	m := freplace.AllPos(ByteMap)
 
 	if r := freplace.ReplacePos(m); string(r) != Expected {
 		t.Errorf("unexpected result for %s: %#v", "freplace-ReplacePos", string(r))
