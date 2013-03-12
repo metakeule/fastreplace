@@ -27,7 +27,7 @@ var replace = &FReplace{}
 
 func TestReplaceMulti(t *testing.T) {
 	Prepare()
-	replace.Parse("@@", Template)
+	replace.Parse([]byte("@@"), Template)
 
 	if r := replace.Replace(Map); string(r) != Expected {
 		t.Errorf("unexpected result: %#v, expected: %#v", string(r), Expected)

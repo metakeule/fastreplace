@@ -1,6 +1,7 @@
 package fastreplace
 
 import (
+	"bytes"
 	"sort"
 )
 
@@ -16,14 +17,14 @@ type FReplace struct {
 	sortedPos []int
 }
 
-func New(delimiter string, input []byte) (ø *FReplace) {
+func New(delimiter []byte, input []byte) (ø *FReplace) {
 	ø = &FReplace{}
 	ø.Parse(delimiter, input)
 	return
 }
 
 func NewString(delimiter string, input string) (ø *FReplace) {
-	return New(delimiter, []byte(input))
+	return New([]byte(delimiter), []byte(input))
 }
 
 // returns a map with all positions and their replacements for the placeholders given in the input map
@@ -39,9 +40,9 @@ func (ø *FReplace) AllPos(in map[string][]byte) (out map[int][]byte) {
 }
 
 // returns all positions for the placeholder string
-func (ø *FReplace) Pos(str string) (p []int) {
+func (ø *FReplace) Pos(placeholder string) (p []int) {
 	for pos, s := range ø.positions {
-		if s == str {
+		if placeholder == s {
 			p = append(p, pos)
 		}
 	}
@@ -85,55 +86,40 @@ func (ø *FReplace) Replace(m map[string][]byte) (res []byte) {
 }
 
 func (ø *FReplace) ParseString(delimiter string, s string) {
-	ø.Parse(delimiter, []byte(s))
+	ø.Parse([]byte(delimiter), []byte(s))
 }
 
 // parse the input for placeholders and caches the result
-func (ø *FReplace) Parse(delimiter string, in []byte) {
+func (ø *FReplace) Parse(delimiter []byte, in []byte) {
 	ø.positions = map[int]string{}
 	ø.original = []byte{}
 	ø.sortedPos = []int{}
-	inAnchor := false
-	startPos := 0
-	var anchor []byte
-	hs := []byte(delimiter)
-	lenDel := len(hs)
+	lenDel := len(delimiter)
 	lenIn := len(in)
-	h := hs[0]
-	i := 0
-	for ii := 0; ii < lenIn; ii++ {
-		b := in[ii]
-		if b == h && lenIn-ii >= lenDel && string(in[ii:ii+lenDel]) == delimiter {
-			for jj := 1; jj < lenDel; jj++ {
-				// fast forward to the end of the delimiter
-				ii++
-			}
-			if inAnchor {
-				inAnchor = false
-				ø.positions[startPos] = string(anchor) // register the cached anchor
-				continue
+	for i := 0; i < lenIn; i++ {
+		found := bytes.Index(in[i:], delimiter)
+		if found != -1 {
+			start := found + i
+			ø.original = append(ø.original, in[i:start]...)
+			startPlaceH := start + lenDel
+			found = bytes.Index(in[startPlaceH:], delimiter)
+			if found == -1 {
+				// is not a delimiter
+				ø.original = append(ø.original, in[startPlaceH:]...)
+				break
 			} else {
-				inAnchor = true
-				startPos = i
-				anchor = []byte{}
-				continue
+				end := found + start + lenDel
+				pos := len(ø.original)
+				ø.sortedPos = append(ø.sortedPos, pos)
+				ø.positions[pos] = string(in[startPlaceH:end])
+				i = end + 1
 			}
-		}
-		if !inAnchor {
-			ø.original = append(ø.original, b)
-			i++
 		} else {
-			anchor = append(anchor, b)
+			ø.original = append(ø.original, in[i:]...)
+			break
 		}
 	}
-
-	sorted := []int{}
-
-	for pos, _ := range ø.positions {
-		sorted = append(sorted, pos)
-	}
-	sort.Ints(sorted)
-	ø.sortedPos = sorted
+	sort.Ints(ø.sortedPos)
 }
 
 // returns an Instance that offers more comfort and caching of replacements
