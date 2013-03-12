@@ -11,6 +11,10 @@ import (
 	see README.md
 */
 
+type Compiler interface {
+	Compile() *FReplace
+}
+
 type FReplace struct {
 	original  []byte
 	positions map[int]string // maps a replacement string/sequence of bytes to an array of the indices of the original before which it appears
