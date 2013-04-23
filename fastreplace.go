@@ -159,6 +159,17 @@ func (ø *Instance) Assign(key string, val []byte) {
 	}
 }
 
+func (ø *Instance) Append(key string, val []byte) {
+	poses := ø.replace.Pos(key)
+	for _, pos := range poses {
+		ø.replacePos[pos] = append(ø.replacePos[pos], val...)
+	}
+}
+
+func (ø *Instance) AppendString(key string, val string) {
+	ø.Append(key, []byte(val))
+}
+
 func (ø *Instance) AssignString(key string, val string) {
 	ø.Assign(key, []byte(val))
 }
