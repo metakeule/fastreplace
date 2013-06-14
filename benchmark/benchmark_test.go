@@ -96,15 +96,15 @@ func TestReplace(t *testing.T) {
 		t.Errorf("unexpected result for %s: %#v, expected: %#v", "byts", string(r), Expected)
 	}
 
-	freplace.Parse([]byte("@@"), ByteTemplate)
+	freplace.ParseBytes([]byte("@@"), ByteTemplate)
 
-	if r := freplace.Replace(ByteMap); string(r) != Expected {
+	if r := freplace.ReplaceBytes(ByteMap); string(r) != Expected {
 		t.Errorf("unexpected result for %s: %#v", "freplace", string(r))
 	}
 
 	m := freplace.AllPos(ByteMap)
 
-	if r := freplace.ReplacePos(m); string(r) != Expected {
+	if r := freplace.ReplacePosBytes(m); string(r) != Expected {
 		t.Errorf("unexpected result for %s: %#v", "freplace-ReplacePos", string(r))
 	}
 }
@@ -124,15 +124,15 @@ func TestReplaceX(t *testing.T) {
 		t.Errorf("unexpected result for %s: %#v", "mapperReg", r)
 	}
 
-	freplace.Parse([]byte("@@"), ByteTemplateX)
+	freplace.ParseBytes([]byte("@@"), ByteTemplateX)
 
-	if r := freplace.Replace(ByteMap); string(r) != ExpectedX {
+	if r := freplace.ReplaceBytes(ByteMap); string(r) != ExpectedX {
 		t.Errorf("unexpected result for %s: %#v, expected: %#v", "freplace", string(r), ExpectedX)
 	}
 
 	m := freplace.AllPos(ByteMap)
 
-	if r := freplace.ReplacePos(m); string(r) != ExpectedX {
+	if r := freplace.ReplacePosBytes(m); string(r) != ExpectedX {
 		t.Errorf("unexpected result for %s: %#v, expected: %#v", "freplace-ReplacePos", string(r), ExpectedX)
 	}
 
@@ -153,15 +153,15 @@ func TestReplaceMulti(t *testing.T) {
 		t.Errorf("unexpected result for %s: %#v", "mapperReg", r)
 	}
 
-	freplace.Parse([]byte("@@"), MultiByteTemplate)
+	freplace.ParseBytes([]byte("@@"), MultiByteTemplate)
 
-	if r := freplace.Replace(MultiByteMap); string(r) != MultiExpected {
+	if r := freplace.ReplaceBytes(MultiByteMap); string(r) != MultiExpected {
 		t.Errorf("unexpected result for %s: %#v, expected: %#v", "freplace", string(r), MultiExpected)
 	}
 
 	m := freplace.AllPos(MultiByteMap)
 
-	if r := freplace.ReplacePos(m); string(r) != MultiExpected {
+	if r := freplace.ReplacePosBytes(m); string(r) != MultiExpected {
 		t.Errorf("unexpected result for %s: %#v, expected: %#v", "freplace-ReplacePos", string(r), MultiExpected)
 	}
 
@@ -200,21 +200,21 @@ func BenchmarkByte(b *testing.B) {
 
 func BenchmarkFReplace(b *testing.B) {
 	b.StopTimer()
-	freplace.Parse([]byte("@@"), ByteTemplateX)
+	freplace.ParseBytes([]byte("@@"), ByteTemplateX)
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		freplace.Replace(ByteMap)
+		freplace.ReplaceBytes(ByteMap)
 	}
 }
 
 func BenchmarkFReplacePos(b *testing.B) {
 	b.StopTimer()
-	freplace.Parse([]byte("@@"), ByteTemplateX)
+	freplace.ParseBytes([]byte("@@"), ByteTemplateX)
 	m := freplace.AllPos(ByteMap)
 
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		freplace.ReplacePos(m)
+		freplace.ReplacePosBytes(m)
 	}
 }
 
@@ -255,21 +255,21 @@ func BenchmarkByteM(b *testing.B) {
 func BenchmarkFReplaceM(b *testing.B) {
 	b.StopTimer()
 	PrepareMulti()
-	freplace.Parse([]byte("@@"), MultiByteTemplate)
+	freplace.ParseBytes([]byte("@@"), MultiByteTemplate)
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		freplace.Replace(MultiByteMap)
+		freplace.ReplaceBytes(MultiByteMap)
 	}
 }
 
 func BenchmarkFReplacePosM(b *testing.B) {
 	b.StopTimer()
 	PrepareMulti()
-	freplace.Parse([]byte("@@"), MultiByteTemplate)
+	freplace.ParseBytes([]byte("@@"), MultiByteTemplate)
 	m := freplace.AllPos(MultiByteMap)
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		freplace.ReplacePos(m)
+		freplace.ReplacePosBytes(m)
 	}
 }
 
@@ -300,7 +300,7 @@ func BenchmarkOneShotByte(b *testing.B) {
 
 func BenchmarkFReplaceOneShot(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		freplace.Parse([]byte("@@"), ByteTemplateX)
-		freplace.Replace(ByteMap)
+		freplace.ParseBytes([]byte("@@"), ByteTemplateX)
+		freplace.ReplaceBytes(ByteMap)
 	}
 }

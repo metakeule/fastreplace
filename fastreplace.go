@@ -13,8 +13,8 @@ import (
 */
 
 type Replacer interface {
-	GetString() string
-	GetBytes() []byte
+	String() string
+	Bytes() []byte
 	AssignBytes(key string, val []byte)
 	AssignString(key string, val string)
 }
@@ -58,7 +58,7 @@ func (ø *FReplace) Pos(placeholder string) (p []int) {
 }
 
 // replace based on positions
-func (ø *FReplace) SetPosBytes(m map[int][]byte) (res []byte) {
+func (ø *FReplace) ReplacePosBytes(m map[int][]byte) (res []byte) {
 	last := 0
 	for _, pos := range ø.sortedPos {
 		res = append(res, ø.original[last:pos]...)
@@ -73,12 +73,12 @@ func (ø *FReplace) SetPosBytes(m map[int][]byte) (res []byte) {
 }
 
 // like Replace but returns a string
-func (ø *FReplace) GetString(m map[string][]byte) (res string) {
-	return string(ø.GetBytes(m))
+func (ø *FReplace) ReplaceString(m map[string][]byte) (res string) {
+	return string(ø.ReplaceBytes(m))
 }
 
 // replace based on placeholders
-func (ø *FReplace) GetBytes(m map[string][]byte) (res []byte) {
+func (ø *FReplace) ReplaceBytes(m map[string][]byte) (res []byte) {
 	last := 0
 	for _, pos := range ø.sortedPos {
 		res = append(res, ø.original[last:pos]...)
@@ -144,12 +144,12 @@ type Instance struct {
 	replacePos map[int][]byte
 }
 
-func (ø *Instance) GetString() string {
-	return string(ø.GetBytes())
+func (ø *Instance) String() string {
+	return string(ø.Bytes())
 }
 
-func (ø *Instance) GetBytes() []byte {
-	return ø.replace.SetPosBytes(ø.replacePos)
+func (ø *Instance) Bytes() []byte {
+	return ø.replace.ReplacePosBytes(ø.replacePos)
 }
 
 func (ø *Instance) AssignBytes(key string, val []byte) {

@@ -33,5 +33,5 @@ func main() {
 
 func merge(name []byte, city []byte) []byte {
 	m := map[int][]byte{posCity: city, posName: name}
-	return r.ReplacePos(m)
+	return r.ReplacePosBytes(m)
 }

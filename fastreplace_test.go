@@ -29,13 +29,13 @@ func TestReplaceMulti(t *testing.T) {
 	Prepare()
 	replace.ParseBytes([]byte("@@"), Template)
 
-	if r := replace.GetString(Map); string(r) != Expected {
+	if r := replace.ReplaceString(Map); string(r) != Expected {
 		t.Errorf("unexpected result: %#v, expected: %#v", string(r), Expected)
 	}
 
 	m := replace.AllPos(Map)
 
-	if r := replace.SetPosBytes(m); string(r) != Expected {
+	if r := replace.ReplacePosBytes(m); string(r) != Expected {
 		t.Errorf("unexpected result for: %#v, expected: %#v", string(r), Expected)
 	}
 }
