@@ -27,21 +27,21 @@ var replace = &FReplace{}
 
 func TestReplaceMulti(t *testing.T) {
 	Prepare()
-	replace.Parse([]byte("@@"), Template)
+	replace.ParseBytes([]byte("@@"), Template)
 
-	if r := replace.Replace(Map); string(r) != Expected {
+	if r := replace.GetString(Map); string(r) != Expected {
 		t.Errorf("unexpected result: %#v, expected: %#v", string(r), Expected)
 	}
 
 	m := replace.AllPos(Map)
 
-	if r := replace.ReplacePos(m); string(r) != Expected {
+	if r := replace.SetPosBytes(m); string(r) != Expected {
 		t.Errorf("unexpected result for: %#v, expected: %#v", string(r), Expected)
 	}
 }
 
 func TestReplaceSyntaxError(t *testing.T) {
-	ſ := replace.Parse([]byte("@@"), []byte("before @@one@@@@two@@ after"))
+	ſ := replace.ParseBytes([]byte("@@"), []byte("before @@one@@@@two@@ after"))
 	// ŧ.Println(ſ)
 	if ſ == nil {
 		t.Errorf("expected syntax error for 2 placeholders side by side, got none")

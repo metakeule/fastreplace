@@ -13,9 +13,9 @@ import (
 */
 
 type Replacer interface {
-	String() string
-	Replace() []byte
-	Assign(key string, val []byte)
+	GetString() string
+	GetBytes() []byte
+	AssignBytes(key string, val []byte)
 	AssignString(key string, val string)
 }
 
@@ -25,14 +25,14 @@ type FReplace struct {
 	sortedPos []int
 }
 
-func New(delimiter []byte, input []byte) (ø *FReplace, ſ error) {
+func NewBytes(delimiter []byte, input []byte) (ø *FReplace, ſ error) {
 	ø = &FReplace{}
-	ſ = ø.Parse(delimiter, input)
+	ſ = ø.ParseBytes(delimiter, input)
 	return
 }
 
 func NewString(delimiter string, input string) (ø *FReplace, ſ error) {
-	return New([]byte(delimiter), []byte(input))
+	return NewBytes([]byte(delimiter), []byte(input))
 }
 
 // returns a map with all positions and their replacements for the placeholders given in the input map
@@ -58,7 +58,7 @@ func (ø *FReplace) Pos(placeholder string) (p []int) {
 }
 
 // replace based on positions
-func (ø *FReplace) ReplacePos(m map[int][]byte) (res []byte) {
+func (ø *FReplace) SetPosBytes(m map[int][]byte) (res []byte) {
 	last := 0
 	for _, pos := range ø.sortedPos {
 		res = append(res, ø.original[last:pos]...)
@@ -73,12 +73,12 @@ func (ø *FReplace) ReplacePos(m map[int][]byte) (res []byte) {
 }
 
 // like Replace but returns a string
-func (ø *FReplace) ReplaceString(m map[string][]byte) (res string) {
-	return string(ø.Replace(m))
+func (ø *FReplace) GetString(m map[string][]byte) (res string) {
+	return string(ø.GetBytes(m))
 }
 
 // replace based on placeholders
-func (ø *FReplace) Replace(m map[string][]byte) (res []byte) {
+func (ø *FReplace) GetBytes(m map[string][]byte) (res []byte) {
 	last := 0
 	for _, pos := range ø.sortedPos {
 		res = append(res, ø.original[last:pos]...)
@@ -94,11 +94,11 @@ func (ø *FReplace) Replace(m map[string][]byte) (res []byte) {
 }
 
 func (ø *FReplace) ParseString(delimiter string, s string) {
-	ø.Parse([]byte(delimiter), []byte(s))
+	ø.ParseBytes([]byte(delimiter), []byte(s))
 }
 
 // parse the input for placeholders and caches the result
-func (ø *FReplace) Parse(delimiter []byte, in []byte) error {
+func (ø *FReplace) ParseBytes(delimiter []byte, in []byte) error {
 	ø.positions = map[int]string{}
 	ø.original = []byte{}
 	ø.sortedPos = []int{}
@@ -144,22 +144,22 @@ type Instance struct {
 	replacePos map[int][]byte
 }
 
-func (ø *Instance) String() string {
-	return string(ø.Replace())
+func (ø *Instance) GetString() string {
+	return string(ø.GetBytes())
 }
 
-func (ø *Instance) Replace() []byte {
-	return ø.replace.ReplacePos(ø.replacePos)
+func (ø *Instance) GetBytes() []byte {
+	return ø.replace.SetPosBytes(ø.replacePos)
 }
 
-func (ø *Instance) Assign(key string, val []byte) {
+func (ø *Instance) AssignBytes(key string, val []byte) {
 	poses := ø.replace.Pos(key)
 	for _, pos := range poses {
 		ø.replacePos[pos] = val
 	}
 }
 
-func (ø *Instance) Append(key string, val []byte) {
+func (ø *Instance) AppendBytes(key string, val []byte) {
 	poses := ø.replace.Pos(key)
 	for _, pos := range poses {
 		ø.replacePos[pos] = append(ø.replacePos[pos], val...)
@@ -167,9 +167,9 @@ func (ø *Instance) Append(key string, val []byte) {
 }
 
 func (ø *Instance) AppendString(key string, val string) {
-	ø.Append(key, []byte(val))
+	ø.AppendBytes(key, []byte(val))
 }
 
 func (ø *Instance) AssignString(key string, val string) {
-	ø.Assign(key, []byte(val))
+	ø.AssignBytes(key, []byte(val))
 }
