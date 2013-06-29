@@ -47,3 +47,24 @@ func TestReplaceSyntaxError(t *testing.T) {
 		t.Errorf("expected syntax error for 2 placeholders side by side, got none")
 	}
 }
+
+type esc struct{}
+
+func (ø esc) Escape(in []byte) []byte {
+	return []byte(strings.Replace(string(in), "a", "o", -1))
+}
+
+var ireplace = &FReplace{InstanceEscaper: esc{}}
+
+func TestReplaceInstanceEscaper(t *testing.T) {
+	ſ := ireplace.ParseString("@@", "@@name@@ went with the elephants.")
+	if ſ != nil {
+		t.Errorf(ſ.Error())
+	}
+	i := ireplace.Instance()
+	i.AssignString("name", "Hannibal")
+	expected := "Honnibol went with the elephants."
+	if i.String() != expected {
+		t.Errorf("unexpected result for: %#v, expected: %#v", i.String(), expected)
+	}
+}

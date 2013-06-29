@@ -20,9 +20,10 @@ type Replacer interface {
 }
 
 type FReplace struct {
-	original  []byte
-	positions map[int]string // maps a replacement string/sequence of bytes to an array of the indices of the original before which it appears
-	sortedPos []int
+	InstanceEscaper Escaper // is only used by instances
+	original        []byte
+	positions       map[int]string // maps a replacement string/sequence of bytes to an array of the indices of the original before which it appears
+	sortedPos       []int
 }
 
 func NewBytes(delimiter []byte, input []byte) (ø *FReplace, ſ error) {
@@ -93,8 +94,8 @@ func (ø *FReplace) ReplaceBytes(m map[string][]byte) (res []byte) {
 	return
 }
 
-func (ø *FReplace) ParseString(delimiter string, s string) {
-	ø.ParseBytes([]byte(delimiter), []byte(s))
+func (ø *FReplace) ParseString(delimiter string, s string) error {
+	return ø.ParseBytes([]byte(delimiter), []byte(s))
 }
 
 // parse the input for placeholders and caches the result
@@ -136,11 +137,16 @@ func (ø *FReplace) ParseBytes(delimiter []byte, in []byte) error {
 
 // returns an Instance that offers more comfort and caching of replacements
 func (ø *FReplace) Instance() Replacer {
-	return &Instance{replace: ø, replacePos: map[int][]byte{}}
+	return &Instance{replace: ø, replacePos: map[int][]byte{}, Escaper: ø.InstanceEscaper}
+}
+
+type Escaper interface {
+	Escape([]byte) []byte
 }
 
 type Instance struct {
 	replace    *FReplace
+	Escaper    Escaper
 	replacePos map[int][]byte
 }
 
@@ -154,15 +160,27 @@ func (ø *Instance) Bytes() []byte {
 
 func (ø *Instance) AssignBytes(key string, val []byte) {
 	poses := ø.replace.Pos(key)
-	for _, pos := range poses {
-		ø.replacePos[pos] = val
+	if ø.Escaper != nil {
+		for _, pos := range poses {
+			ø.replacePos[pos] = ø.Escaper.Escape(val)
+		}
+	} else {
+		for _, pos := range poses {
+			ø.replacePos[pos] = val
+		}
 	}
 }
 
 func (ø *Instance) AppendBytes(key string, val []byte) {
 	poses := ø.replace.Pos(key)
-	for _, pos := range poses {
-		ø.replacePos[pos] = append(ø.replacePos[pos], val...)
+	if ø.Escaper != nil {
+		for _, pos := range poses {
+			ø.replacePos[pos] = append(ø.replacePos[pos], ø.Escaper.Escape(val)...)
+		}
+	} else {
+		for _, pos := range poses {
+			ø.replacePos[pos] = append(ø.replacePos[pos], val...)
+		}
 	}
 }
 
