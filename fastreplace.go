@@ -17,6 +17,7 @@ type Replacer interface {
 	Bytes() []byte
 	AssignBytes(key string, val []byte)
 	AssignString(key string, val string)
+	Placeholders() (ph map[string]bool)
 }
 
 type FReplace struct {
@@ -148,6 +149,14 @@ type Instance struct {
 	replace    *FReplace
 	Escaper    Escaper
 	replacePos map[int][]byte
+}
+
+func (ø *Instance) Placeholders() (ph map[string]bool) {
+	ph = map[string]bool{}
+	for _, p := range ø.replace.positions {
+		ph[p] = true
+	}
+	return
 }
 
 func (ø *Instance) String() string {
