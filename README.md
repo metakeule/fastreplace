@@ -1,6 +1,11 @@
 fastreplace
 ===========
 
+STATUS:
+While it still works as advertised, this package is not maintained any longer in favor
+of https://github.com/metakeule/replacer which is a rewrite based on the same idea with
+a much simpler usage and it is even a bit faster.
+
 [![Build Status](https://secure.travis-ci.org/metakeule/fastreplace.png)](http://travis-ci.org/metakeule/fastreplace)
 
 The typical scenario is that your template never changes but the replacements for you placeholders. fastreplace
