@@ -4,7 +4,6 @@ import (
 	"bytes"
 	ŧ "fmt"
 	. "github.com/metakeule/fastreplace"
-	"github.com/metakeule/replacer"
 	"regexp"
 	"strings"
 	"testing"
@@ -99,7 +98,6 @@ var mapperNaive = &Naive{}
 var mapperReg = &Regexp{Regexp: regexp.MustCompile("(@@[^@]+@@)")}
 var freplace = &FReplace{}
 var byts = &Bytes{}
-var freplace2 = replacer.New()
 
 func TestReplace(t *testing.T) {
 	mapperNaive.Map = Map
@@ -139,16 +137,6 @@ func TestReplace(t *testing.T) {
 		t.Errorf("unexpected result for %s: %#v", "freplace-ReplacePos", string(r))
 	}
 
-	efr2 := freplace2.Parse(ByteTemplate)
-	if efr2 != nil {
-		panic(efr2.Error())
-	}
-
-	var bf bytes.Buffer
-	//if r := fr2.Replace(PlaceholderMap); string(r) != Expected {
-	if freplace2.Replace(PlaceholderMap, &bf); bf.String() != Expected {
-		t.Errorf("unexpected result for %s: %#v", "fastreplace2", bf.String())
-	}
 }
 
 func TestReplaceX(t *testing.T) {
@@ -184,16 +172,6 @@ func TestReplaceX(t *testing.T) {
 		t.Errorf("unexpected result for %s: %#v, expected: %#v", "freplace-ReplacePos", string(r), ExpectedX)
 	}
 
-	efr2 := freplace2.Parse(ByteTemplateX)
-
-	if efr2 != nil {
-		panic(efr2.Error())
-	}
-
-	var bf bytes.Buffer
-	if freplace2.Replace(PlaceholderMap, &bf); bf.String() != ExpectedX {
-		t.Errorf("unexpected result for %s: %#v", "fastreplace2", bf.String())
-	}
 }
 
 func TestReplaceMulti(t *testing.T) {
@@ -229,17 +207,6 @@ func TestReplaceMulti(t *testing.T) {
 		t.Errorf("unexpected result for %s: %#v, expected: %#v", "freplace-ReplacePos", string(r), MultiExpected)
 	}
 
-	efr2 := freplace2.Parse(MultiByteTemplate)
-	if efr2 != nil {
-		panic(efr2.Error())
-	}
-
-	var bf bytes.Buffer
-
-	//if r := fr2.Replace(MultiPlaceholderMap); string(r) != MultiExpected {
-	if freplace2.Replace(MultiPlaceholderMap, &bf); bf.String() != MultiExpected {
-		t.Errorf("unexpected result for %s: %#v", "fastreplace2", bf.String())
-	}
 }
 
 func BenchmarkNaive(b *testing.B) {
@@ -301,19 +268,6 @@ func BenchmarkFReplacePos(b *testing.B) {
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		freplace.ReplacePosBytes(m)
-	}
-}
-
-func BenchmarkFReplace2(b *testing.B) {
-	b.StopTimer()
-	freplace2.Parse(ByteTemplateX)
-	var bf bytes.Buffer
-	//freplace.ParseBytes([]byte("@@"), ByteTemplateX)
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
-		//freplace.ReplaceBytes(ByteMap)
-		freplace2.Replace(PlaceholderMap, &bf)
-		bf.Reset()
 	}
 }
 
@@ -384,20 +338,6 @@ func BenchmarkFReplacePosM(b *testing.B) {
 	}
 }
 
-func BenchmarkFReplace2M(b *testing.B) {
-	b.StopTimer()
-	PrepareMulti()
-	freplace2.Parse(MultiByteTemplate)
-	var bf bytes.Buffer
-	//freplace.ParseBytes([]byte("@@"), MultiByteTemplate)
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
-		freplace2.Replace(MultiPlaceholderMap, &bf)
-		bf.Reset()
-		//freplace.ReplaceBytes(MultiByteMap)
-	}
-}
-
 func BenchmarkNaiveOneShot(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		mapperNaive.Map = Map
@@ -435,15 +375,5 @@ func BenchmarkFReplaceOneShot(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		freplace.ParseBytes([]byte("@@"), ByteTemplateX)
 		freplace.ReplaceBytes(ByteMap)
-	}
-}
-
-func BenchmarkFReplace2OneShot(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		//freplace.ParseBytes([]byte("@@"), ByteTemplateX)
-		freplace2.Parse(ByteTemplateX)
-		//freplace.ReplaceBytes(ByteMap)
-		var bf bytes.Buffer
-		freplace2.Replace(PlaceholderMap, &bf)
 	}
 }
